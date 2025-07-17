@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>LSTM Sprachmodell mit TensorFlow.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.19.0/dist/tf.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <h1>LSTM Sprachmodell mit TensorFlow.js</h1>
+    <section class="projekt-info">
+        <div class="info-box">
+            <div class="info-row"><span class="label">👤 Name:</span> Aroua Sdiri</div>
+            <div class="info-row"><span class="label">🎓 Matrikelnummer:</span> 914427</div>
+            <div class="info-row"><span class="label">📘 Modul:</span> Deep Learning</div>
+            <div class="info-row"><span class="label">📝 Aufgabe:</span> EA 3 – Language Model mit LSTM</div>
+        </div>
+    </section>
+
+    <h2>Starttext eingeben</h2>
+    <textarea id="input" rows="3" placeholder="Gib deinen Starttext ein..."></textarea><br>
+
+    <button onclick="showPrediction()">Vorhersage</button>
+    <button onclick="continueWithBestWord()">Weiter</button>
+    <button onclick="startAutoGeneration()">Auto</button>
+    <button onclick="stopAutoGeneration()">Stopp</button>
+    <button onclick="resetInput()">Reset</button>
+
+    <div id="output" class="output" aria-live="polite"></div>
+    <div id="plotContainer" style="margin-top: 20px;"></div>
+
+    <h2>Diskussion</h2>
+    <p>Das LSTM-Modell liefert bei einfachen, häufigen Satzanfängen plausible Vorhersagen. Die Genauigkeit sinkt jedoch
+        bei
+        seltenen oder komplexen Eingaben. Besonders nützlich ist die Top-5-Ausgabe, da die beste Einzelvorhersage oft
+        nicht
+        zutrifft. Wiederholungen und grammatikalische Fehler treten bei längeren Generierungen auf. Insgesamt zeigt das
+        Modell grundlegende Sprachmuster, jedoch mit Verbesserungspotenzial.</p>
+
+    <h2>Evaluation</h2>
+    <div id="evaluationResult">Modell wird ausgewertet...</div>
+
+    <h2>Technische Dokumentation</h2>
+    <ul>
+        <li><strong>TensorFlow.js:</strong> Das Modell wird vollständig im Browser über TensorFlow.js geladen und
+            ausgeführt, wodurch keine serverseitige Verarbeitung notwendig ist.</li>
+        <li><strong>Modellarchitektur:</strong> Das Netzwerk besteht aus zwei gestapelten LSTM-Schichten mit jeweils 100
+            Einheiten, gefolgt von einer Dense-Ausgabe-Schicht mit Softmax-Aktivierung zur Wahrscheinlichkeitsverteilung
+            über den Wortschatz.</li>
+        <li><strong>Loss-Funktion:</strong> Es wird die kategorische Kreuzentropie (Categorical Cross-Entropy)
+            verwendet, da
+            es sich um ein Multiklassen-Klassifikationsproblem handelt.</li>
+        <li><strong>Optimierer:</strong> Adam-Optimierer mit einer Lernrate von 0.01, angepasst für stabile und schnelle
+            Konvergenz.</li>
+        <li><strong>Datenquelle:</strong> Der Trainingskorpus basiert auf dem vollständigen Text von Goethes „Faust. Der
+            Tragödie erster Teil“ (ca. 6000 Zeilen). Der Text wurde bereinigt, tokenisiert und in numerische Sequenzen
+            umgewandelt.</li>
+        <li><strong>Evaluation:</strong> Die Modellqualität wird anhand von Top-k-Accuracy (k = 1, 5, 10, 20, 100) sowie
+            der
+            Perplexity gemessen. Dabei zeigt sich, dass die Genauigkeit mit steigendem k deutlich zunimmt, was auf ein
+            breites, aber noch unsicheres Sprachverständnis hindeutet.</li>
+    </ul>
+
+    <h2>Fachliche Dokumentation</h2>
+    <p>Der Nutzer kann ein beliebiges Textfragment eingeben, das durch Tokenisierung in eine Sequenz numerischer
+        Wort-IDs
+        überführt wird. Diese Eingabesequenz wird über Padding auf eine feste Länge gebracht (max. 9 Tokens). Das
+        LSTM-Modell generiert auf Basis dieses Kontexts die Wahrscheinlichkeitsverteilung für das nächste Wort. Es sind
+        sowohl manuelle als auch automatische Textgenerierungen möglich (Einzelwortvorhersage, Weiter-Button oder
+        automatische Fortsetzung über bis zu 10 Schritte). Die Modellgüte wurde über Top-k-Accuracy und Perplexity
+        evaluiert. Aufgrund des begrenzten Datenumfangs und der kleinen Architektur zeigt das Modell inhaltlich
+        sinnvolle,
+        aber oft einfache oder sich wiederholende Vorhersagen. Es eignet sich gut als Demonstrator für autoregressive
+        Textgenerierung im Browser, jedoch nicht für produktive Textverarbeitung. Die Vorverarbeitung, Modellarchitektur
+        und
+        Evaluierung wurden bewusst einfach gehalten, um den Fokus auf Verständlichkeit und Interaktivität zu legen.</p>
+    <p><strong>Datenschutzbetrachtung:</strong> Das trainierte Sprachmodell zeigt bei wiederholter Textgenerierung
+        gelegentlich Sequenzen, die stark an den Trainingskorpus erinnern. Bei Verwendung sensibler oder
+        personenbezogener
+        Daten (z. B. E-Mails, interne Dokumente) könnte dies ein Datenschutzrisiko darstellen, da eine Rekonstruktion
+        oder
+        das „Leak“ von Trainingsinhalten möglich wäre. In diesem Projekt wurde jedoch ein öffentlich zugänglicher, nicht
+        personenbezogener Korpus (Wikipedia-ähnlicher Text über Deutschland) verwendet. Daher besteht kein Risiko für
+        Datenschutzverletzungen.</p>
+
+    <footer>
+        <hr>
+        <p>&copy; 2025 Aroua Sdiri – ESA3 – Deep Learning</p>
+    </footer>
+
+    <script src="model/model.js"></script>
+</body>
+
+</html>
